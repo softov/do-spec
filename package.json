@@ -1,0 +1,50 @@
+{
+  "name": "dospec",
+  "version": "0.1.0",
+  "description": "Install the dospec Agent Skills into Codex, Claude Code, pi, VS Code or any Agent Skills client.",
+  "keywords": [
+    "agent-skills",
+    "agentskills",
+    "skills",
+    "installer",
+    "codex",
+    "claude-code",
+    "pi",
+    "copilot",
+    "vscode",
+    "dospec",
+    "artifacts",
+    "spec-driven"
+  ],
+  "author": "Fernando Softov",
+  "license": "MIT",
+  "type": "commonjs",
+  "homepage": "https://github.com/softov/dospec#readme",
+  "bugs": {
+    "url": "https://github.com/softov/dospec/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/softov/dospec.git"
+  },
+  "bin": {
+    "dospec": "bin/dospec.js"
+  },
+  "files": [
+    "bin/",
+    "scripts/",
+    ".agents/"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "scripts": {
+    "list": "node bin/dospec.js --list",
+    "prepublishOnly": "node bin/dospec.js --list"
+  }
+}
