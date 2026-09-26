@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# Install the skills in .agents/skills/ for VS Code (GitHub Copilot).
+# Install the skills in skills/ for VS Code (GitHub Copilot).
 set -eu
 
 script_dir=$(CDPATH= cd "$(dirname "$0")" && pwd -P)

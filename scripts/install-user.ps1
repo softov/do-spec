@@ -1,5 +1,5 @@
 #!/usr/bin/env pwsh
-# Install the skills in .agents/skills/ for any client that reads the Agent Skills standard, on Windows.
+# Install the skills in skills/ for any client that reads the Agent Skills standard, on Windows.
 [CmdletBinding()]
 param(
   [string[]]$Skill,

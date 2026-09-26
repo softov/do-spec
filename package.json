@@ -1,7 +1,7 @@
 {
-  "name": "dospec",
+  "name": "do-skills",
   "version": "0.1.0",
-  "description": "Install the dospec Agent Skills into Codex, Claude Code, pi, VS Code or any Agent Skills client.",
+  "description": "Install the do-skills Agent Skills into Codex, Claude Code, pi, VS Code or any Agent Skills client.",
   "keywords": [
     "agent-skills",
     "agentskills",
@@ -12,28 +12,29 @@
     "pi",
     "copilot",
     "vscode",
-    "dospec",
+    "do-skills",
+    "do-spec",
     "artifacts",
     "spec-driven"
   ],
   "author": "Fernando Softov",
   "license": "MIT",
   "type": "commonjs",
-  "homepage": "https://github.com/softov/dospec#readme",
+  "homepage": "https://github.com/softov/do-skills#readme",
   "bugs": {
-    "url": "https://github.com/softov/dospec/issues"
+    "url": "https://github.com/softov/do-skills/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/softov/dospec.git"
+    "url": "git+https://github.com/softov/do-skills.git"
   },
   "bin": {
-    "dospec": "bin/dospec.js"
+    "do-skills": "bin/do-skills.js"
   },
   "files": [
     "bin/",
     "scripts/",
-    ".agents/"
+    "skills/"
   ],
   "engines": {
     "node": ">=18"
@@ -44,7 +45,7 @@
     "win32"
   ],
   "scripts": {
-    "list": "node bin/dospec.js --list",
-    "prepublishOnly": "node bin/dospec.js --list"
+    "list": "node bin/do-skills.js --list",
+    "prepublishOnly": "node bin/do-skills.js --list"
   }
 }

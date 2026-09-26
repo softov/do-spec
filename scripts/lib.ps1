@@ -1,11 +1,11 @@
-# Shared logic for the dospec installers on Windows (Windows PowerShell 5.1 and PowerShell 7+).
+# Shared logic for the do-skills installers on Windows (Windows PowerShell 5.1 and PowerShell 7+).
 #
 # Dot-sourced by install-<agent>.ps1, never run directly. An installer calls:
 #
 #   Invoke-SkillInstaller -RepoRoot <dir> -AgentLabel <name> -DefaultSkillsDir <dir>
 #     -Note <text> -ScriptName <file> @PSBoundParameters
 #
-# Every skill in <RepoRoot>\.agents/skills is installed as <SkillsDir>\<skill>,
+# Every skill in <RepoRoot>\skills is installed as <SkillsDir>\<skill>,
 # unless -Skill names one or more.
 
 Set-StrictMode -Version Latest
@@ -14,19 +14,19 @@ function Get-SkillNames {
   [CmdletBinding()]
   param([Parameter(Mandatory)][string]$RepoRoot)
 
-  $agentsDir = Join-Path $RepoRoot '.agents/skills'
-  if (-not (Test-Path -LiteralPath $agentsDir -PathType Container)) {
-    throw "no .agents/skills directory in $RepoRoot"
+  $skillsRoot = Join-Path $RepoRoot 'skills'
+  if (-not (Test-Path -LiteralPath $skillsRoot -PathType Container)) {
+    throw "no skills/ directory in $RepoRoot"
   }
 
   $names = @(
-    Get-ChildItem -LiteralPath $agentsDir -Directory |
+    Get-ChildItem -LiteralPath $skillsRoot -Directory |
       Where-Object { Test-Path -LiteralPath (Join-Path $_.FullName 'SKILL.md') -PathType Leaf } |
       Select-Object -ExpandProperty Name |
       Sort-Object
   )
   if ($names.Count -eq 0) {
-    throw "no skills found in $agentsDir"
+    throw "no skills found in $skillsRoot"
   }
   return $names
 }
@@ -67,7 +67,7 @@ Options:
   -Link        create a directory junction instead of copying, needs no admin
   -Force       replace existing installs
   -DryRun      print what would happen and exit
-  -List        list the skills found in .agents/skills
+  -List        list the skills found in skills
   -Help        show this help
 
 Each skill <name> is installed at <DEST>\<name>.
@@ -101,7 +101,7 @@ function Invoke-SkillInstaller {
   $available = @(Get-SkillNames -RepoRoot $RepoRoot)
 
   if ($List) {
-    Write-Host "skills in $(Join-Path $RepoRoot '.agents/skills'):"
+    Write-Host "skills in $(Join-Path $RepoRoot 'skills'):"
     foreach ($name in $available) { Write-Host "  $name" }
     return
   }
@@ -133,7 +133,7 @@ function Invoke-SkillInstaller {
 
   # Refuse the whole run before touching anything if one destination is in the way.
   foreach ($name in $installList) {
-    $source = Join-Path (Join-Path $RepoRoot '.agents/skills') $name
+    $source = Join-Path (Join-Path $RepoRoot 'skills') $name
     $target = Join-Path $skillsDir $name
     if ($source -eq $target) { throw "the install target is the source directory: $source" }
     if (Test-Path -LiteralPath $target) {
@@ -144,8 +144,8 @@ function Invoke-SkillInstaller {
   $verb = if ($Link) { 'link' } else { 'copy' }
   if ($DryRun) {
     foreach ($name in $installList) {
-      $source = Join-Path (Join-Path $RepoRoot '.agents/skills') $name
-      Write-Host "dospec: dry run: would $verb $source to $(Join-Path $skillsDir $name)"
+      $source = Join-Path (Join-Path $RepoRoot 'skills') $name
+      Write-Host "do-skills: dry run: would $verb $source to $(Join-Path $skillsDir $name)"
     }
     return
   }
@@ -153,7 +153,7 @@ function Invoke-SkillInstaller {
   New-Item -ItemType Directory -Path $skillsDir -Force | Out-Null
   $installed = 0
   foreach ($name in $installList) {
-    $source = Join-Path (Join-Path $RepoRoot '.agents/skills') $name
+    $source = Join-Path (Join-Path $RepoRoot 'skills') $name
     $target = Join-Path $skillsDir $name
     if (Test-Path -LiteralPath $target) { Remove-Item -LiteralPath $target -Recurse -Force }
 
@@ -167,11 +167,11 @@ function Invoke-SkillInstaller {
       Copy-Item -LiteralPath $source -Destination $target -Recurse -Force
     }
 
-    Write-Host "dospec: installed $target"
+    Write-Host "do-skills: installed $target"
     $installed++
   }
 
-  Write-Host "dospec: $installed skill(s) installed for $AgentLabel in $skillsDir."
-  Write-Host "dospec: $Note"
-  Write-Host "dospec: Start a new $AgentLabel session to load them."
+  Write-Host "do-skills: $installed skill(s) installed for $AgentLabel in $skillsDir."
+  Write-Host "do-skills: $Note"
+  Write-Host "do-skills: Start a new $AgentLabel session to load them."
 }

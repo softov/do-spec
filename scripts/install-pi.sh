@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# Install the skills in .agents/skills/ for pi.
+# Install the skills in skills/ for pi.
 set -eu
 
 script_dir=$(CDPATH= cd "$(dirname "$0")" && pwd -P)

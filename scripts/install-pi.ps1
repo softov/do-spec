@@ -1,5 +1,5 @@
 #!/usr/bin/env pwsh
-# Install the skills in .agents/skills/ for pi on Windows.
+# Install the skills in skills/ for pi on Windows.
 [CmdletBinding()]
 param(
   [string[]]$Skill,

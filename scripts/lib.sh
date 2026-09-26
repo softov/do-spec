@@ -1,32 +1,32 @@
 #!/usr/bin/env sh
-# Shared logic for the dospec installers.
+# Shared logic for the do-skills installers.
 #
 # Sourced by install-<agent>.sh, never run directly. An installer ends with:
 #
 #   run_installer <repo-root> <agent-label> <default-skills-dir> <note> [options]
 #
-# Every skill in <repo-root>/.agents/skills/ is installed as <skills-dir>/<skill>,
+# Every skill in <repo-root>/skills/ is installed as <skills-dir>/<skill>,
 # unless one or more --skill names are given.
 
 die() {
-  printf 'dospec: error: %s\n' "$*" >&2
+  printf 'do-skills: error: %s\n' "$*" >&2
   exit 1
 }
 
 info() {
-  printf 'dospec: %s\n' "$*"
+  printf 'do-skills: %s\n' "$*"
 }
 
-# Print the name of every skill in <repo-root>/.agents/skills, one per line.
+# Print the name of every skill in <repo-root>/skills, one per line.
 discover_skills() {
-  for manifest in "$1"/.agents/skills/*/SKILL.md; do
+  for manifest in "$1"/skills/*/SKILL.md; do
     [ -f "$manifest" ] || continue
     basename "$(dirname "$manifest")"
   done | sort
 }
 
 list_skills() {
-  printf 'skills in %s/.agents/skills:\n' "$REPO_ROOT"
+  printf 'skills in %s/skills:\n' "$REPO_ROOT"
   discover_skills "$REPO_ROOT" | sed 's/^/  /'
 }
 
@@ -43,7 +43,7 @@ Options:
   --link        symlink each skill directory instead of copying
   --force       replace existing installs
   --dry-run     print what would happen and exit
-  --list        list the skills found in $REPO_ROOT/.agents/skills
+  --list        list the skills found in $REPO_ROOT/skills
   -h, --help    show this help
 
 Each skill <name> is installed at <DEST>/<name>.
@@ -110,9 +110,9 @@ run_installer() {
     esac
   done
 
-  [ -d "$REPO_ROOT/.agents/skills" ] || die "no .agents/skills directory in $REPO_ROOT"
+  [ -d "$REPO_ROOT/skills" ] || die "no skills/ directory in $REPO_ROOT"
   available=$(discover_skills "$REPO_ROOT")
-  [ -n "$available" ] || die "no skills found in $REPO_ROOT/.agents/skills"
+  [ -n "$available" ] || die "no skills found in $REPO_ROOT/skills"
 
   if [ -n "$selection" ]; then
     for name in $selection; do
@@ -127,7 +127,7 @@ run_installer() {
 
   # Refuse the whole run before touching anything if one destination is in the way.
   for name in $install_list; do
-    src=$REPO_ROOT/.agents/skills/$name
+    src=$REPO_ROOT/skills/$name
     dest=$skills_dir/$name
     [ "$src" != "$dest" ] || die "the install target is the source directory: $src"
     if [ -e "$dest" ] || [ -L "$dest" ]; then
@@ -137,7 +137,7 @@ run_installer() {
 
   if [ "$dry_run" -eq 1 ]; then
     for name in $install_list; do
-      info "dry run: would $mode $REPO_ROOT/.agents/skills/$name to $skills_dir/$name"
+      info "dry run: would $mode $REPO_ROOT/skills/$name to $skills_dir/$name"
     done
     return 0
   fi
@@ -145,7 +145,7 @@ run_installer() {
   mkdir -p "$skills_dir"
   installed=0
   for name in $install_list; do
-    src=$(CDPATH= cd "$REPO_ROOT/.agents/skills/$name" && pwd -P)
+    src=$(CDPATH= cd "$REPO_ROOT/skills/$name" && pwd -P)
     dest=$skills_dir/$name
     if [ -e "$dest" ] || [ -L "$dest" ]; then
       rm -rf "$dest"

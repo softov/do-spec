@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# Install the skills in .agents/skills/ for one or more agents.
+# Install the skills in skills/ for one or more agents.
 #
 # Usage: install.sh <agent> [<agent> ...] [installer options]
 # Agents: codex claude pi vscode user all
@@ -14,7 +14,7 @@ repo_root=$(CDPATH= cd "$script_dir/.." && pwd -P)
 
 usage() {
   cat <<'EOF'
-Install the skills in .agents/skills/ for one or more agents.
+Install the skills in skills/ for one or more agents.
 
 Usage: install.sh <agent> [<agent> ...] [options]
 
@@ -29,7 +29,7 @@ Agents:
 Options, forwarded to each installer:
   --skill NAME  --dest DIR  --copy  --link  --force  --dry-run
 
-Every skill in .agents/skills/ is installed unless --skill names one or more.
+Every skill in skills/ is installed unless --skill names one or more.
 
 Examples:
   install.sh all
@@ -44,8 +44,8 @@ case ${1:-} in
   -h|--help) usage; exit 0 ;;
   --list)
     printf 'Agents:\n  codex\n  claude\n  pi\n  vscode\n  user\n'
-    printf 'Skills in .agents/skills/:\n'
-    for manifest in "$repo_root"/.agents/skills/*/SKILL.md; do
+    printf 'Skills in skills/:\n'
+    for manifest in "$repo_root"/skills/*/SKILL.md; do
       [ -f "$manifest" ] || continue
       printf '  %s\n' "$(basename "$(dirname "$manifest")")"
     done | sort

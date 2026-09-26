@@ -1,5 +1,5 @@
 #!/usr/bin/env pwsh
-# Install the skills in .agents/skills/ for Claude Code on Windows.
+# Install the skills in skills/ for Claude Code on Windows.
 [CmdletBinding()]
 param(
   [string[]]$Skill,

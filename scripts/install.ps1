@@ -1,5 +1,5 @@
 #!/usr/bin/env pwsh
-# Install the skills in .agents/skills/ for one or more agents on Windows.
+# Install the skills in skills/ for one or more agents on Windows.
 #
 # Usage: install.ps1 <agent> [<agent> ...] [options]
 # Agents: codex claude pi vscode user all
@@ -24,7 +24,7 @@ $known = @('codex', 'claude', 'pi', 'vscode', 'user')
 
 function Show-Usage {
   @"
-Install the skills in .agents/skills/ for one or more agents.
+Install the skills in skills/ for one or more agents.
 
 Usage: install.ps1 <agent> [<agent> ...] [options]
 
@@ -39,7 +39,7 @@ Agents:
 Options, forwarded to each installer:
   -Skill NAME  -Dest DIR  -Copy  -Link  -Force  -DryRun
 
-Every skill in .agents/skills/ is installed unless -Skill names one or more.
+Every skill in skills/ is installed unless -Skill names one or more.
 
 Examples:
   install.ps1 all
@@ -55,8 +55,8 @@ if ($Help) { Show-Usage; return }
 if ($List) {
   Write-Host 'Agents:'
   foreach ($agent in $known) { Write-Host "  $agent" }
-  Write-Host 'Skills in .agents/skills/:'
-  Get-ChildItem -LiteralPath (Join-Path $repoRoot '.agents/skills') -Directory |
+  Write-Host 'Skills in skills/:'
+  Get-ChildItem -LiteralPath (Join-Path $repoRoot 'skills') -Directory |
     Where-Object { Test-Path -LiteralPath (Join-Path $_.FullName 'SKILL.md') -PathType Leaf } |
     Select-Object -ExpandProperty Name |
     Sort-Object |

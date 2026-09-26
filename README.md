@@ -1,4 +1,4 @@
-# dospec
+# do-skills
 
 Agent skills for the `.project/ artifacts` way of working: what a project is building lives in files an agent can read, and each skill teaches the agent to write those files.
 
@@ -8,13 +8,13 @@ Skills follow the [Agent Skills specification](https://agentskills.io/specificat
 
 | Skill | Path | What it does |
 | --- | --- | --- |
-| `do-spec` | [.agents/skills/do-spec](.agents/skills/do-spec) | Creates and maintains `.project/` artifacts (plans with their task files, implemented and deferred records, domain references, specs, rules, decisions, research) in the `.project/ artifacts` 0.1 format. |
+| `do-spec` | [skills/do-spec](skills/do-spec) | Creates and maintains `.project/` artifacts (plans with their task files, implemented and deferred records, domain references, specs, rules, decisions, research) in the `.project/ artifacts` 0.1 format. |
 
 ```text
 .
-├── package.json              the published package, name: dospec
+├── package.json              the published package, name: do-skills
 ├── bin/
-│   └── dospec.js             npx entry point, launches a platform installer
+│   └── do-skills.js          npx entry point, launches a platform installer
 ├── scripts/                  installers for every skill in this repository
 │   ├── lib.sh                shared POSIX logic, not run directly
 │   ├── install.sh            POSIX dispatcher: one or more agents
@@ -22,35 +22,36 @@ Skills follow the [Agent Skills specification](https://agentskills.io/specificat
 │   ├── lib.ps1               shared PowerShell logic, not run directly
 │   ├── install.ps1           PowerShell dispatcher
 │   └── install-<agent>.ps1   one per agent
-└── .agents/
-    └── skills/
-        └── do-spec/
-            ├── SKILL.md      instructions the agent loads
-            └── assets/       the file templates it writes from
+└── skills/
+    └── do-spec/
+        ├── SKILL.md          instructions the agent loads
+        └── assets/           the file templates it writes from
 ```
 
-The installers live at the root because they cover every skill, not one of them. Adding a skill is dropping a directory with a `SKILL.md` under `.agents/skills/`; the installers find it on their own.
+`skills/<name>/SKILL.md` is the layout clients and installers expect: the specification requires a skill's `name` to match its parent directory, and a skill directory is what every client scans for. Adding a skill is dropping a directory with a `SKILL.md` under `skills/`; the installers find it on their own.
+
+The installers live at the root because they cover every skill, not one of them.
 
 ## Install
 
-Each agent reads skills from its own directory, and one script installs the skills for one agent. By default it installs every skill in `.agents/skills/`; `--skill` (PowerShell: `-Skill`) limits it to one or more. The default is a copy. The link option points the agent at the installed skill directory instead, so edits there show up immediately.
+Each agent reads skills from its own directory, and one script installs the skills for one agent. By default it installs every skill in `skills/`; `--skill` (PowerShell: `-Skill`) limits it to one or more. The default is a copy. The link option points the agent at the skill directory in this repository instead, so edits there show up immediately.
 
 ### With npx
 
-The package is published as [`dospec`](https://www.npmjs.com/package/dospec) and ships the skills and the installers together, so npx needs nothing else on the machine.
+The package is published as [`do-skills`](https://www.npmjs.com/package/do-skills) and ships the skills and the installers together, so npx needs nothing else on the machine.
 
 ```sh
 # the agents already configured on this machine, else ~/.agents/skills
-npx dospec
+npx do-skills
 
 # one agent
-npx dospec claude
+npx do-skills claude
 
 # two agents, one skill, linked
-npx dospec codex pi --skill do-spec --link
+npx do-skills codex pi --skill do-spec --link
 
 # straight from the repository, no publish needed
-npx github:softov/dospec claude
+npx github:softov/do-skills claude
 ```
 
 With no agent named, the CLI installs for whichever of `~/.codex`, `~/.claude`, `~/.pi`, `~/.copilot` and `~/.agents` already exist, falling back to `~/.agents/skills` when none do. It prints which agents it chose.
@@ -68,6 +69,47 @@ With no agent named, the CLI installs for whichever of `~/.codex`, `~/.claude`, 
 | `-h`, `--help` | usage |
 
 The CLI is a launcher, not a third implementation. It resolves the agent and the skills, then runs the `sh` or `ps1` installer that ships in `scripts/`, so its behavior cannot drift from the scripts below.
+
+#### If npx refuses or cannot authenticate
+
+Two things bite people on npm 12, and neither is this package.
+
+`EALLOWGIT: Fetching packages of type "git" have been disabled` means npm's `allow-git` is `none`, which is the npm 12 default, so it refuses every git spec. Pass `--allow-git=all` for one run, or persist it with `npm config set allow-git=all`. Once `do-skills` is on the registry, `npx do-skills` needs neither, because it is no longer a git spec.
+
+A private repository is the second: `npx github:` clones over HTTPS, so it needs git credentials. Run `gh auth setup-git` once, or make the repository public. Never pass a token as a command argument, because npx echoes its arguments and `--token gho_...` ends up in your terminal and your logs; use a credential helper instead.
+
+```sh
+gh auth setup-git
+npx --allow-git=all github:softov/do-skills claude
+```
+
+Without npm at all, the same files come from a tarball, which needs no `allow-git` and no git. Drop the `-H` header once the repository is public:
+
+```sh
+tmp=$(mktemp -d)
+curl -fsSL -H "Authorization: token $(gh auth token)" \
+  https://codeload.github.com/softov/do-skills/tar.gz/refs/heads/main -o "$tmp/do-skills.tgz"
+mkdir -p "$tmp/src" && tar xzf "$tmp/do-skills.tgz" -C "$tmp/src" --strip-components=1
+"$tmp/src/scripts/install-claude.sh"
+```
+
+### Universal installer
+
+[`agent-skills-cli`](https://www.npmjs.com/package/agent-skills-cli) installs skills for many agents and reads the same Agent Skills layout, so `do-spec` passes its `validate`. Point it at the skill directory, not at the repository:
+
+```sh
+# from a clone, works today; installs into the project unless -g is passed
+npx agent-skills-cli install ./skills/do-spec -a claude
+
+# from GitHub, once the repository is public
+npx agent-skills-cli install-url https://github.com/softov/do-skills/tree/main/skills/do-spec
+```
+
+`install` is also spelled `add` and `i`. `-a` takes one or more agents (`-a claude,cursor`), `--all` targets every agent the CLI knows, and `-g` installs user-wide instead of into the current project.
+
+`install-url` fetches `SKILL.md` from `raw.githubusercontent.com`, which needs no credentials only while the repository is public. A private repository can use the first form from a clone.
+
+Do not hand it the repository URL. `npx agent-skills-cli install https://github.com/softov/do-skills` treats the whole repository as one skill named after the repository, so it copies `.git`, `bin/` and `scripts/` and leaves `SKILL.md` where no agent will load it. That is how the CLI handles a repository-root source, not a problem with this layout, and the two commands above avoid it.
 
 ### From a clone: macOS, Linux, WSL and Git Bash
 
@@ -93,7 +135,7 @@ scripts/install-user.sh --dest .agents/skills
 scripts/install.sh all --dry-run
 ```
 
-`scripts/install.sh` takes one or more agents (`codex`, `claude`, `pi`, `vscode`, `user`, or `all`) followed by installer options, and `--list` prints the agents and the skills found in `.agents/skills/`.
+`scripts/install.sh` takes one or more agents (`codex`, `claude`, `pi`, `vscode`, `user`, or `all`) followed by installer options, and `--list` prints the agents and the skills found in `skills/`.
 
 Under Git Bash and MSYS2, `--link` does not create a symlink: `ln -s` deep-copies by default, so it behaves like `--copy`. Real symlinks there need Developer Mode plus `MSYS=winsymlinks:nativestrict`, and an NTFS volume. Use WSL if you want `--link` to mean what it says.
 
@@ -140,7 +182,7 @@ Both script families accept the same flags.
 | `--link` | `-Link` | link the skill directories instead of copying |
 | `--force` | `-Force` | replace existing installs |
 | `--dry-run` | `-DryRun` | print what would happen and exit |
-| `--list` | `-List` | list the skills found in `.agents/skills/` |
+| `--list` | `-List` | list the skills found in `skills/` |
 | `-h`, `--help` | `-Help` | usage |
 
 The installers touch only `<DEST>/<skill>`. They never edit an agent's settings or a skill they did not install. Start a new agent session after installing so it picks up the skills.
@@ -152,33 +194,33 @@ Any client that reads Agent Skills works with a plain copy into the directory it
 ```sh
 # user level, every project
 mkdir -p ~/.claude/skills
-cp -R .agents/skills/do-spec ~/.claude/skills/do-spec
+cp -R skills/do-spec ~/.claude/skills/do-spec
 
 # project level, committed with the repository
 mkdir -p "$PROJECT/.agents/skills"
-cp -R .agents/skills/do-spec "$PROJECT/.agents/skills/do-spec"
+cp -R skills/do-spec "$PROJECT/.agents/skills/do-spec"
 ```
 
 ```powershell
 # user level, every project
 New-Item -ItemType Directory -Force "$HOME\.claude\skills" | Out-Null
-Copy-Item -Recurse .agents\skills\do-spec "$HOME\.claude\skills\do-spec"
+Copy-Item -Recurse skills\do-spec "$HOME\.claude\skills\do-spec"
 
 # project level, committed with the repository
 New-Item -ItemType Directory -Force "$PROJECT\.agents\skills" | Out-Null
-Copy-Item -Recurse .agents\skills\do-spec "$PROJECT\.agents\skills\do-spec"
+Copy-Item -Recurse skills\do-spec "$PROJECT\.agents\skills\do-spec"
 ```
 
 ## Publishing
 
-The package is unscoped and public. `files` whitelists `bin/`, `scripts/` and `.agents/`, so the tarball carries the skills and the installers and nothing else.
+The package is unscoped and public. `files` whitelists `bin/`, `scripts/` and `skills/`, so the tarball carries the skills and the installers and nothing else.
 
 ```sh
 npm pack --dry-run   # inspect exactly what would be published
 npm publish          # after npm login
 ```
 
-`prepublishOnly` lists the skills and fails the publish if `.agents/skills/` is missing or a skill has no `SKILL.md`.
+`prepublishOnly` lists the skills and fails the publish if `skills/` is missing or a skill has no `SKILL.md`.
 
 ## Reference links
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env sh
-# Install the skills in .agents/skills/ for OpenAI Codex.
+# Install the skills in skills/ for OpenAI Codex.
 set -eu
 
 script_dir=$(CDPATH= cd "$(dirname "$0")" && pwd -P)

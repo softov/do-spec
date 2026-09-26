@@ -1,5 +1,5 @@
 #!/usr/bin/env pwsh
-# Install the skills in .agents/skills/ for VS Code (GitHub Copilot) on Windows.
+# Install the skills in skills/ for VS Code (GitHub Copilot) on Windows.
 [CmdletBinding()]
 param(
   [string[]]$Skill,
@@ -20,6 +20,6 @@ $default = if ($env:COPILOT_HOME) { Join-Path $env:COPILOT_HOME 'skills' } else 
 Invoke-SkillInstaller -RepoRoot (Split-Path -Parent $PSScriptRoot) `
   -AgentLabel 'VS Code' `
   -DefaultSkillsDir $default `
-  -Note 'VS Code discovers personal skills under %USERPROFILE%\.copilot\skills, .claude\skills and .agents\skills.' `
+  -Note 'VS Code discovers personal skills under %USERPROFILE%\.copilot\skills, %USERPROFILE%\.claude\skills and %USERPROFILE%\.agents\skills.' `
   -ScriptName 'install-vscode.ps1' `
   @PSBoundParameters

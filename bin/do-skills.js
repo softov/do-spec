@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 
-// npx entry point for the dospec package.
+// npx entry point for the do-skills package.
 //
 // This is a launcher, not a third implementation: it resolves the agent and the
 // skills, then runs the POSIX or PowerShell installer that ships in scripts/.
@@ -17,7 +17,7 @@ const AGENT_NAMES = ['codex', 'claude', 'pi', 'vscode', 'user'];
 const IS_WINDOWS = process.platform === 'win32';
 
 function fail(message) {
-  process.stderr.write(`dospec: error: ${message}\n`);
+  process.stderr.write(`do-skills: error: ${message}\n`);
   process.exit(1);
 }
 
@@ -44,12 +44,12 @@ function agentBaseDir(agent) {
 }
 
 function discoverSkills() {
-  const dir = path.join(ROOT, '.agents', 'skills');
+  const dir = path.join(ROOT, 'skills');
   let entries;
   try {
     entries = fs.readdirSync(dir, { withFileTypes: true });
   } catch {
-    fail(`no .agents/skills directory in ${ROOT}`);
+    fail(`no skills/ directory in ${ROOT}`);
   }
   const skills = entries
     .filter((entry) => entry.isDirectory() && fs.existsSync(path.join(dir, entry.name, 'SKILL.md')))
@@ -104,11 +104,11 @@ function parseArgs(argv) {
 }
 
 function helpText() {
-  return `dospec - install the dospec Agent Skills
+  return `do-skills - install the do-skills Agent Skills
 
 Usage:
-  npx dospec [agent ...] [options]
-  npx github:softov/dospec [agent ...] [options]
+  npx do-skills [agent ...] [options]
+  npx github:softov/do-skills [agent ...] [options]
 
 Agents:
   codex    OpenAI Codex              -> ~/.codex/skills
@@ -131,9 +131,9 @@ Options:
   -h, --help        show this help
 
 Examples:
-  npx dospec
-  npx dospec claude --link
-  npx dospec codex pi --skill do-spec
+  npx do-skills
+  npx do-skills claude --link
+  npx do-skills codex pi --skill do-spec
 `;
 }
 
@@ -195,20 +195,20 @@ function main() {
     if (!AGENT_NAMES.includes(agent)) fail(`unknown agent: ${agent} (try --list)`);
   }
   if (opts.agents.length === 0) {
-    process.stdout.write(`dospec: installing for ${agents.join(', ')} (use --agent to choose)\n`);
+    process.stdout.write(`do-skills: installing for ${agents.join(', ')} (use --agent to choose)\n`);
   }
 
   let failed = false;
   for (const agent of agents) {
     const { cmd, args, script } = installerCommand(agent, { ...opts, skills: requested });
     if (!fs.existsSync(script)) {
-      process.stderr.write(`dospec: missing installer ${script}\n`);
+      process.stderr.write(`do-skills: missing installer ${script}\n`);
       failed = true;
       continue;
     }
     const result = spawnSync(cmd, args, { stdio: 'inherit' });
     if (result.error) {
-      process.stderr.write(`dospec: failed to run ${cmd}: ${result.error.message}\n`);
+      process.stderr.write(`do-skills: failed to run ${cmd}: ${result.error.message}\n`);
       failed = true;
     } else if (result.status !== 0) {
       failed = true;
