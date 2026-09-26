@@ -13,6 +13,8 @@ creates:
   - specs/<new-spec>.md
 decisions:
   - decisions/<decision>.md
+problems:
+  - problems/<slug>.md
 refs:
   - "[code://packages/<package>/src/<file>.ts#L<n>-L<m>](../../../../packages/<package>/src/<file>.ts#L<n>-L<m>) - <what it does today and why it matters here>"
   - "[code://packages/<package>/src/<other>.ts](../../../../packages/<package>/src/<other>.ts) - <the pattern this plan mirrors>"

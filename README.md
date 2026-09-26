@@ -8,7 +8,7 @@ Skills follow the [Agent Skills specification](https://agentskills.io/specificat
 
 | Skill | Path | What it does |
 | --- | --- | --- |
-| `do-spec` | [skills/do-spec](skills/do-spec) | Creates and maintains `.project/` artifacts (plans with their task files, implemented and deferred records, domain references, specs, rules, decisions, research) in the `.project/ artifacts` 0.1 format. |
+| `do-spec` | [skills/do-spec](skills/do-spec) | Creates and maintains `.project/` artifacts (plans with their task files, implemented and deferred records, domain references, specs, rules, decisions, problems, research) in the `.project/ artifacts` 0.2 format. |
 
 ```text
 .
