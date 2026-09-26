@@ -5,7 +5,6 @@ date: <YYYY-MM-DD>
 severity: <blocker | major | minor>
 blocks:
   - plans/<domain>/<NN>-<slug>/task-<NN>-<slug>.md
-fixed-by: plans/<domain>/<NN>-<slug>/task-<NN>-<slug>.md
 refs:
   - "[code://<path>#L<n>](../../<path>#L<n>) - <where it shows>"
   - git://<sha> - <the change that introduced it>
@@ -29,4 +28,4 @@ refs:
 
 ## Fix
 
-<What would resolve it, and the task or plan that owns it when one exists.>
+<Candidate fixes, none chosen yet. Once one is chosen, the fix is a task and this file is deleted.>
