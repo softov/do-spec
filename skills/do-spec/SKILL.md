@@ -60,6 +60,16 @@ A plan that spans more than two packages or about eight tasks is a parent whose 
 
 To close a plan: every task `done` or `dropped`, `implemented.md` written, `deferred.md` written if anything waits, `status: built`, specs in `changes` and `creates` corrected, the index row updated.
 
+## Task sections
+
+`## Files` and `## Steps` in a task are read by tools as well as agents, so every line under them has one form.
+
+- A Files line is ``- `<OP>: <path>` - <note>.``, with `OP` one of `CREATE`, `UPDATE`, `DELETE`.
+- The path is relative to the repository root and is never linked. Only `UPDATE` may add a line range: `<path>:<n>` or `<path>:<n>-<m>`.
+- The note is required and says what the file holds, what changes there, or why it goes.
+- A Steps line is `<N>. <step>`, numbered from 1 with no gaps. One step is one line, with no nested list under it.
+- Nothing else goes under either heading: no prose between lines, no blank-line groups, no sub-headings.
+
 ## Decisions, rules, specs
 
 - A decision that replaces another is a new file with `supersedes`; the old one gets `status: superseded` and `superseded-by`, body untouched; rules and specs that pointed at the old one move to the new one unless the old rationale still holds.
