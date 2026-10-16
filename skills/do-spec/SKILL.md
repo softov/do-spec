@@ -28,6 +28,7 @@ Start every file from its template in `assets/`; the template says what goes in 
 ## Conventions
 
 - Frontmatter on every file; `title` always. Slugs are kebab-case; only plans and tasks carry a number.
+- A plan folder name and a task file name without `.md` are at most 48 characters, with the number.
 - A path is an identity: nothing is moved or deleted; what no longer applies gets a `status`. Two exceptions: a problem is deleted once it becomes plan work, and a superseded decision is deleted once the decision that replaces it names it.
 - Paths in frontmatter are relative to `.project/`, except a task's `depends`, which names sibling task files.
 - `refs` say where something is, never its state, one per line as `<uri> - <one line on why it is here>`. A ref is a URI: `code://<path>#L<n>-L<m>`, `npm://<package>@<range>`, `git://<sha|branch|tag>`, `tasker://<instance>:<project>#<id>`, `https://...`, `file://...`. A plan's files read and patterns to reuse are its refs; nothing lists them twice.
@@ -74,7 +75,8 @@ A plan is a folder: `plan.md`, one task file per task, and two files whose prese
 Anything not in *Answers* is undecided; a fork met during a task means stop, ask, add a row.
 A task's status moves in its own file and in the plan's *Tasks* table, in the same change.
 The plan's *Resume state* and `index.md` move with it.
-A plan that spans more than two packages or about eight tasks is a parent whose *Tasks* table lists child plans (`<NN>-<slug>-p<N>-<slug>/`).
+A plan that spans more than two packages or about eight tasks is a parent whose *Tasks* table lists child plans.
+A child plan folder is `<NN>-p<N>-<slug>/`: it keeps the parent's number and not its slug.
 
 To close a plan, every task is `done` or `dropped`, and `implemented.md` is written, with `deferred.md` if anything waits.
 Then set `status: built`, correct the specs in `changes` and `creates`, and update the index row.
