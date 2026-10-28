@@ -14,7 +14,7 @@ Start every file from its template in `assets/`; the template says what goes in 
 |---|---|---|
 | idea | [idea.md](assets/idea.md) | `.project/ideas/<slug>.md` |
 | brief | [brief.md](assets/brief.md) | `.project/briefs/<slug>.md` |
-| plan | [plan.md](assets/plan.md) | `.project/plans/<domain>/<NN>-<slug>/plan.md` |
+| plan | [plan.md](assets/plan.md) | `.project/plans/<domain>/<id>-<slug>/plan.md` |
 | task | [task.md](assets/task.md) | same folder, `task-<NN>-<slug>.md` |
 | implemented | [implemented.md](assets/implemented.md) | same folder, `implemented.md` |
 | deferred | [deferred.md](assets/deferred.md) | same folder, `deferred.md` |
@@ -25,18 +25,20 @@ Start every file from its template in `assets/`; the template says what goes in 
 | problem | [problem.md](assets/problem.md) | `.project/problems/<slug>.md` |
 | research | Markdown with a `title` | `.project/research/<slug>.md` |
 
-`scripts/plans.mjs` lists the plans from each `plan.md` frontmatter: `node <skill-dir>/scripts/plans.mjs [--all] [<project-dir>]`. It prints the open plans by domain and priority, what each requires and blocks, and the next free number of each domain. With `--all` it prints the `built` and `dropped` plans too. No index of plans is kept by hand.
+`scripts/plans.mjs` lists the plans from each `plan.md` frontmatter: `node <skill-dir>/scripts/plans.mjs [--all] [<project-dir>]`. It prints the open plans by domain and priority, and what each requires and blocks. With `--all` it prints the `built` and `dropped` plans too. No index of plans is kept by hand.
 
 ## Conventions
 
-- Frontmatter on every file; `title` always. Slugs are kebab-case; only plans and tasks carry a number.
-- A plan folder name and a task file name without `.md` are at most 48 characters, with the number.
+- Frontmatter on every file; `title` always. Slugs are kebab-case. A plan folder starts with an id, and a task file with a number.
+- A plan's id is the time it was made, in UTC: `<YYYYMMDD>-<HHMM>`, such as `20261028-0555`. Two plans made in the same minute differ by their slug, so nobody claims or renumbers an id.
+- A plan folder name is at most 56 characters, with the id. A task file name without `.md` is at most 48 characters, with the number. A task's number counts from `01` in its plan.
+- An existing plan folder named `<NN>-<slug>/` keeps its name.
 - A path is an identity: nothing is moved or deleted; what no longer applies gets a `status`. Two exceptions: an idea, a brief or a problem is deleted once later work covers it. A superseded decision is deleted once the decision that replaces it names it.
 - Paths in frontmatter are relative to `.project/`, except a task's `depends`, which names sibling task files.
 - `refs` say where something is, never its state, one per line as `<uri> - <one line on why it is here>`. A ref is a URI: `code://<path>#L<n>-L<m>`, `npm://<package>@<range>`, `git://<sha|branch|tag>`, `tasker://<instance>:<project>#<id>`, `https://...`, `file://...`. A plan's files read and patterns to reuse are its refs; nothing lists them twice.
 - A `code://` ref is local code, so write it as a Markdown link. Keep the URI as the link text. Make the target the same path, relative to the file you are writing. In a decision at `.project/decisions/`, that is `[code://packages/papo/src/chat.ts#L51](../../packages/papo/src/chat.ts#L51)`. The text keeps the URI searchable and the target makes it clickable in a Markdown view. In a body, the same link reads better with the URI in a code span: ``[`code://<path>`](../../<path>)``.
 - Quote the whole ref in frontmatter, because a list item that starts with `[` is YAML flow sequence syntax: `- "[code://packages/papo/src/chat.ts#L51](../../packages/papo/src/chat.ts#L51) - the configured default"`. Escape a `"` in the note as `\"`.
-- The target carries one `../` per level between the file's folder and the repository root. That is four from `.project/plans/<domain>/<NN>-<slug>/`, three from `.project/plans/<domain>/00-<domain>.md`, two from `.project/ideas/`, `.project/briefs/`, `.project/specs/`, `.project/rules/`, `.project/decisions/`, `.project/problems/`, `.project/research/`.
+- The target carries one `../` per level between the file's folder and the repository root. That is four from `.project/plans/<domain>/<id>-<slug>/`, three from `.project/plans/<domain>/00-<domain>.md`, two from `.project/ideas/`, `.project/briefs/`, `.project/specs/`, `.project/rules/`, `.project/decisions/`, `.project/problems/`, `.project/research/`.
 - Only `code://` is linked; `npm://`, `git://`, `tasker://`, `https://` and `file://` stay bare, because they are not files in this repository. Never link a path the repository does not have yet, such as a `CREATE:` entry or a spec named in `creates`.
 - Globs (`applies`, `covers`) are relative to the repository root.
 - A fact is written in one file. Another file links to it, or a script prints it; nobody copies it by hand. The one copy left is a task's status in the plan's *Tasks* table.

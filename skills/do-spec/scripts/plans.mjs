@@ -5,7 +5,7 @@
 // The project directory defaults to the current one and holds `.project/plans/`.
 // Without `--all`, `built` and `dropped` plans are left out.
 //
-// Each domain is printed with its next free plan number, then one line per plan:
+// Each domain is printed as a heading, then one line per plan:
 // status, priority, path, title. A plan's `requires`, and the plans that require
 // it, follow on their own lines.
 
@@ -65,12 +65,6 @@ const plansIn = (root) => {
   return plans;
 };
 
-/** One more than the highest leading number of a plan folder in the domain. */
-const nextNumber = (plans) => {
-  const numbers = plans.map((plan) => Number(plan.folder.match(/^(\d+)-/)?.[1] ?? 0));
-  return String(Math.max(0, ...numbers) + 1).padStart(2, '0');
-};
-
 const rank = (priority) => {
   const at = PRIORITY.indexOf(priority);
   return at === -1 ? PRIORITY.length : at;
@@ -97,7 +91,7 @@ for (const domain of domains) {
   const shown = own
     .filter((plan) => all || !CLOSED.has(plan.status))
     .sort((a, b) => rank(a.priority) - rank(b.priority) || a.folder.localeCompare(b.folder, 'en', { numeric: true }));
-  console.log(`## ${domain} (next free number: ${nextNumber(own)})`);
+  console.log(`## ${domain}`);
   for (const plan of shown) {
     console.log(`${plan.status.padEnd(8)} ${plan.priority.padEnd(7)} ${plan.id}  ${plan.title}`);
     if (plan.requires.length > 0) console.log(`${' '.repeat(17)}requires ${plan.requires.join(', ')}`);

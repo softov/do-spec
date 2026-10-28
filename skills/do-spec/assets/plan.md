@@ -6,7 +6,7 @@ priority: medium
 created: <YYYY-MM-DD>
 revalidated: <YYYY-MM-DD>
 requires:
-  - plans/<domain>/<NN>-<slug>/plan.md
+  - plans/<domain>/<id>-<slug>/plan.md
 changes:
   - specs/<existing-spec>.md
 creates:
