@@ -1,6 +1,6 @@
 ---
 name: do-spec
-description: Create and maintain the `.project/ artifacts` that let an agent understand what a project is building, why each decision was made, which rules hold, which problems are open, what has been implemented, and what work remains, so the record survives across agents and sessions. Use when writing, amending or closing a plan, task, decision, problem, spec, rule, research note or implementation record, when moving a task's status, and when templates, paths, references, statuses and cross-links must stay consistent.
+description: Create and maintain the `.project/ artifacts` that let an agent understand what a project is building, why each decision was made, which rules hold, which problems are open, which ideas and briefs wait, what has been implemented, and what work remains, so the record survives across agents and sessions. Use when writing, amending or closing an idea, brief, plan, task, decision, problem, spec, rule, research note or implementation record, when moving a task's status, and when templates, paths, references, statuses and cross-links must stay consistent.
 metadata:
   artifacts: "0.2"
 ---
@@ -12,6 +12,8 @@ Start every file from its template in `assets/`; the template says what goes in 
 
 | Kind | Template | Path |
 |---|---|---|
+| idea | [idea.md](assets/idea.md) | `.project/ideas/<slug>.md` |
+| brief | [brief.md](assets/brief.md) | `.project/briefs/<slug>.md` |
 | plan | [plan.md](assets/plan.md) | `.project/plans/<domain>/<NN>-<slug>/plan.md` |
 | task | [task.md](assets/task.md) | same folder, `task-<NN>-<slug>.md` |
 | implemented | [implemented.md](assets/implemented.md) | same folder, `implemented.md` |
@@ -29,12 +31,12 @@ Start every file from its template in `assets/`; the template says what goes in 
 
 - Frontmatter on every file; `title` always. Slugs are kebab-case; only plans and tasks carry a number.
 - A plan folder name and a task file name without `.md` are at most 48 characters, with the number.
-- A path is an identity: nothing is moved or deleted; what no longer applies gets a `status`. Two exceptions: a problem is deleted once it becomes plan work, and a superseded decision is deleted once the decision that replaces it names it.
+- A path is an identity: nothing is moved or deleted; what no longer applies gets a `status`. Two exceptions: an idea, a brief or a problem is deleted once later work covers it. A superseded decision is deleted once the decision that replaces it names it.
 - Paths in frontmatter are relative to `.project/`, except a task's `depends`, which names sibling task files.
 - `refs` say where something is, never its state, one per line as `<uri> - <one line on why it is here>`. A ref is a URI: `code://<path>#L<n>-L<m>`, `npm://<package>@<range>`, `git://<sha|branch|tag>`, `tasker://<instance>:<project>#<id>`, `https://...`, `file://...`. A plan's files read and patterns to reuse are its refs; nothing lists them twice.
 - A `code://` ref is local code, so write it as a Markdown link. Keep the URI as the link text. Make the target the same path, relative to the file you are writing. In a decision at `.project/decisions/`, that is `[code://packages/papo/src/chat.ts#L51](../../packages/papo/src/chat.ts#L51)`. The text keeps the URI searchable and the target makes it clickable in a Markdown view. In a body, the same link reads better with the URI in a code span: ``[`code://<path>`](../../<path>)``.
 - Quote the whole ref in frontmatter, because a list item that starts with `[` is YAML flow sequence syntax: `- "[code://packages/papo/src/chat.ts#L51](../../packages/papo/src/chat.ts#L51) - the configured default"`. Escape a `"` in the note as `\"`.
-- The target carries one `../` per level between the file's folder and the repository root. That is four from `.project/plans/<domain>/<NN>-<slug>/`, three from `.project/plans/<domain>/00-<domain>.md`, two from `.project/specs/`, `.project/rules/`, `.project/decisions/`, `.project/problems/`, `.project/research/`.
+- The target carries one `../` per level between the file's folder and the repository root. That is four from `.project/plans/<domain>/<NN>-<slug>/`, three from `.project/plans/<domain>/00-<domain>.md`, two from `.project/ideas/`, `.project/briefs/`, `.project/specs/`, `.project/rules/`, `.project/decisions/`, `.project/problems/`, `.project/research/`.
 - Only `code://` is linked; `npm://`, `git://`, `tasker://`, `https://` and `file://` stay bare, because they are not files in this repository. Never link a path the repository does not have yet, such as a `CREATE:` entry or a spec named in `creates`.
 - Globs (`applies`, `covers`) are relative to the repository root.
 - One full sentence per line in prose. Never an em dash.
@@ -64,6 +66,17 @@ It prints `file:line: rule` and exits 1 when it finds anything.
 - problem: `open` `mitigated`
 - rule: `active` `retired` · spec: `current` `retired`
 
+## Ideas and briefs
+
+An idea and a brief come before a plan. Each has no status: while the file exists, it waits.
+
+- An idea is a few sentences on something that might be built, and why. It has no research and no design.
+- A brief is the research for one change: the goal first, then verified facts with links, then the change as statements. Another agent plans or builds from it, so it holds only facts checked at a named commit.
+- A brief is written in the repository it is about. A brief that spans repositories goes in the one that is built first.
+- A brief that covers an idea names it in `replaces`, with a `git://<sha>` ref to the last commit that holds it. The idea file is deleted.
+- A plan that covers a brief names it the same way in its `refs`. The brief file is deleted.
+- A change to another project's code is not a brief. It goes where the project keeps its upstream proposals.
+
 ## Plans
 
 A plan is a folder: `plan.md`, one task file per task, and two files whose presence is their meaning:
@@ -71,8 +84,20 @@ A plan is a folder: `plan.md`, one task file per task, and two files whose prese
 - `implemented.md` exists when the plan is built: what exists now, what was verified, where it departed from the plan.
 - `deferred.md` exists when the plan set something aside: what waits, why, where it goes.
 
+Before a plan is written, each choice that the brief, the code and the reference leave open is a question to the user.
+
+- Ask one decision per question, with the question tool when the agent has one.
+- Explain each term that the user may not know before the question uses it.
+- Give two to four options. Put the suggested option first, and say why it is suggested.
+- Each option gives its pros, its cons and its impact. The impact says what changes for the user, which code and data it touches, and what is hard to undo later.
+- An option's label and its text state the same outcome.
+- A choice that a question states as a given is a decision too. Ask it first, as its own question.
+- A detail with only one safe answer is not a question. Take that answer and record it as `(defaulted: ...)`.
+- An answer that does not fit the question means the question was not clear. Explain, and ask again with neutral words.
+- Each answer becomes a row in *Answers*, with the user's words and the date.
+
 `plan.md` is forward-action-only: each answer now and its source, never how it changed.
-Anything not in *Answers* is undecided; a fork met during a task means stop, ask, add a row.
+Anything not in *Answers* is undecided; a fork met during a task means stop, ask as the list above says, and add a row.
 A task's status moves in its own file and in the plan's *Tasks* table, in the same change.
 The plan's *Resume state* and `index.md` move with it.
 A plan that spans more than two packages or about eight tasks is a parent whose *Tasks* table lists child plans.
@@ -106,7 +131,7 @@ Then set `status: built`, correct the specs in `changes` and `creates`, and upda
 ## Before writing
 
 1. Read `.project/plans/index.md` and the domain's `00-<domain>.md`.
-2. Check the thing does not already exist; amend rather than duplicate.
+2. Check the thing does not already exist, in `ideas/` and `briefs/` too; amend rather than duplicate.
 3. Find the refs: the code, package, commit or document it came from.
 
 ## Finding what `.project/` already says about a file
