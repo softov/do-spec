@@ -14,13 +14,17 @@ refs:
 
 <The goal, first: what the user wants and why, in one paragraph. Side findings stay out.>
 
-## What <the reference> does
+## What others do
 
-<How the reference implementation or the source document does it, with links. Delete the section if there is no reference.>
+<How other projects solve the same problem, each with a link. When the project follows one reference, how that reference does it, at the version checked.>
 
 ## What <the project> has today
 
 <Verified facts only, each with a `code://` link: what exists, what is missing.>
+
+## Who writes
+
+<Every writer to the files the change touches: other branches, forks, other sessions. For each, what the change does to it.>
 
 ## The change
 

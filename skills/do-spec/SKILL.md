@@ -39,11 +39,12 @@ Start every file from its template in `assets/`; the template says what goes in 
 - The target carries one `../` per level between the file's folder and the repository root. That is four from `.project/plans/<domain>/<NN>-<slug>/`, three from `.project/plans/<domain>/00-<domain>.md`, two from `.project/ideas/`, `.project/briefs/`, `.project/specs/`, `.project/rules/`, `.project/decisions/`, `.project/problems/`, `.project/research/`.
 - Only `code://` is linked; `npm://`, `git://`, `tasker://`, `https://` and `file://` stay bare, because they are not files in this repository. Never link a path the repository does not have yet, such as a `CREATE:` entry or a spec named in `creates`.
 - Globs (`applies`, `covers`) are relative to the repository root.
+- A fact is written in one file. Another file links to it, or a script prints it; nobody copies it by hand. The one copy left is a task's status in the plan's *Tasks* table.
 - One full sentence per line in prose. Never an em dash.
 
 ## Writing
 
-Prose follows the writing rules of ASD-STE100 (Simplified Technical English), without its dictionary.
+Prose takes its rules from ASD-STE100 (Simplified Technical English), without its dictionary. The aim is a file that is short and in order, not strict STE.
 A procedural section is a task's `## Steps` and `## Validation`; everything else is descriptive.
 
 - A sentence has one topic. A procedural sentence has at most 20 words; a descriptive one at most 25.
@@ -54,6 +55,11 @@ A procedural section is a task's `## Steps` and `## Validation`; everything else
 - One word names one thing, and one thing has one word. The domain's glossary (`00-<domain>.md`) says which word; a synonym is a second thing to the reader.
 - Use a plain verb where one exists, not a phrasal verb: "remove", not "take away".
 - A code span, a link and a URL count as one word.
+- Say a thing once. What another file or section already says is a link, not a second copy.
+- Remove a sentence that adds no fact, and words that add no meaning, such as "in order to" or "note that".
+- Put facts of the same kind in a list or a table, not in a paragraph.
+- Start a section with what it holds. The detail comes after.
+- Name a section by its heading, in italics: "as *Asking the user* says". Never point at text by its place, with words such as "above", "below" or "the same way".
 
 `scripts/lint-prose.mjs` checks sentence length, passive voice in procedural sections and em dashes: `node <skill-dir>/scripts/lint-prose.mjs <file-or-directory>...`.
 It prints `file:line: rule` and exits 1 when it finds anything.
@@ -72,9 +78,11 @@ An idea and a brief come before a plan. Each has no status: while the file exist
 
 - An idea is a few sentences on something that might be built, and why. It has no research and no design.
 - A brief is the research for one change: the goal first, then verified facts with links, then the change as statements. Another agent plans or builds from it, so it holds only facts checked at a named commit.
+- A brief says how other projects solve the same problem, each with a link. When the project follows one reference, it says how that reference does it.
+- A brief names every writer to the files that the change touches: other branches, forks, other sessions. It checks the change for each of them.
 - A brief is written in the repository it is about. A brief that spans repositories goes in the one that is built first.
 - A brief that covers an idea names it in `replaces`, with a `git://<sha>` ref to the last commit that holds it. The idea file is deleted.
-- A plan that covers a brief names it the same way in its `refs`. The brief file is deleted.
+- A plan that covers a brief names it in its `refs`, with a `git://<sha>` ref to the last commit that holds it. The brief file is deleted.
 - A change to another project's code is not a brief. It goes where the project keeps its upstream proposals.
 
 ## Plans
@@ -83,6 +91,27 @@ A plan is a folder: `plan.md`, one task file per task, and two files whose prese
 
 - `implemented.md` exists when the plan is built: what exists now, what was verified, where it departed from the plan.
 - `deferred.md` exists when the plan set something aside: what waits, why, where it goes.
+
+`plan.md` is forward-action-only: each answer now and its source, never how it changed.
+Anything not in *Answers* is undecided; a fork met during a task means stop, ask as *Asking the user* says, and add a row.
+A task's status moves in its own file and in the plan's *Tasks* table, in the same change.
+The plan's *Resume state* and `index.md` move with it.
+A plan is one feature with few tasks. A larger change is two or more plans, each one feature, linked by `requires`.
+A plan never lists child plans. An existing child plan folder, `<NN>-p<N>-<slug>/`, keeps its name.
+
+To close a plan, every task is `done` or `dropped`, and `implemented.md` is written, with `deferred.md` if anything waits.
+Then set `status: built`, correct the specs in `changes` and `creates`, and update the index row.
+
+### Shaping a plan
+
+- The plan builds what the user stated. The agent never puts its own design in place of the user's.
+- When a choice of the user is clearly wrong or has a large impact, argue against it before the plan is written. Give the reasons from the code, the facts and the cost. If the user keeps the choice, the plan builds it.
+- Before a plan changes a structure, read the spec, the vendor documents and the sibling code. A second instance of a thing copies the shape of the first one.
+- Look for a function or a component that already does the work, and reuse it. Code that two places need is written once and shared, and the plan names it in its `refs`.
+- Review each design to make it simpler before you offer it or plan it.
+- Two valid behaviours become a setting with a default, not a question with one winner.
+
+### Asking the user
 
 Before a plan is written, each choice that the brief, the code and the reference leave open is a question to the user.
 
@@ -95,16 +124,6 @@ Before a plan is written, each choice that the brief, the code and the reference
 - A detail with only one safe answer is not a question. Take that answer and record it as `(defaulted: ...)`.
 - An answer that does not fit the question means the question was not clear. Explain, and ask again with neutral words.
 - Each answer becomes a row in *Answers*, with the user's words and the date.
-
-`plan.md` is forward-action-only: each answer now and its source, never how it changed.
-Anything not in *Answers* is undecided; a fork met during a task means stop, ask as the list above says, and add a row.
-A task's status moves in its own file and in the plan's *Tasks* table, in the same change.
-The plan's *Resume state* and `index.md` move with it.
-A plan that spans more than two packages or about eight tasks is a parent whose *Tasks* table lists child plans.
-A child plan folder is `<NN>-p<N>-<slug>/`: it keeps the parent's number and not its slug.
-
-To close a plan, every task is `done` or `dropped`, and `implemented.md` is written, with `deferred.md` if anything waits.
-Then set `status: built`, correct the specs in `changes` and `creates`, and update the index row.
 
 ## Task sections
 
@@ -152,6 +171,6 @@ Do it also when a code comment cites a decision number that no plan on disk expl
 ## Finishing
 
 - No `<placeholder>` left. Every frontmatter path and every relative link resolves (`creates` may name a spec not yet written).
-- Every `status` is one of the values above for its kind.
+- Every `status` is one of the values in *Statuses* for its kind.
 - `index.md` has the row and the status.
 - `scripts/lint-prose.mjs` passes on every file you wrote, or each finding it prints is one you chose to keep.

@@ -28,7 +28,7 @@ refs:
 
 ## Reconnaissance
 
-The files read and the patterns to reuse are the `refs` above, each with its note.
+The files read and the patterns to reuse are the `refs` in the frontmatter, each with its note.
 
 ### Searches performed
 
