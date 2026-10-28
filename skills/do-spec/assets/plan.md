@@ -81,4 +81,3 @@ The files read and the patterns to reuse are the `refs` in the frontmatter, each
 ## Final verification checklist
 
 - [ ] <check>
-- [ ] `plans/index.md` updated.

@@ -25,7 +25,7 @@ Start every file from its template in `assets/`; the template says what goes in 
 | problem | [problem.md](assets/problem.md) | `.project/problems/<slug>.md` |
 | research | Markdown with a `title` | `.project/research/<slug>.md` |
 
-`.project/plans/index.md` is the entry: one row per plan, kept by hand.
+`scripts/plans.mjs` lists the plans from each `plan.md` frontmatter: `node <skill-dir>/scripts/plans.mjs [--all] [<project-dir>]`. It prints the open plans by domain and priority, what each requires and blocks, and the next free number of each domain. With `--all` it prints the `built` and `dropped` plans too. No index of plans is kept by hand.
 
 ## Conventions
 
@@ -95,12 +95,12 @@ A plan is a folder: `plan.md`, one task file per task, and two files whose prese
 `plan.md` is forward-action-only: each answer now and its source, never how it changed.
 Anything not in *Answers* is undecided; a fork met during a task means stop, ask as *Asking the user* says, and add a row.
 A task's status moves in its own file and in the plan's *Tasks* table, in the same change.
-The plan's *Resume state* and `index.md` move with it.
+When a task's status changes, update the plan's *Resume state* in the same change.
 A plan is one feature with few tasks. A larger change is two or more plans, each one feature, linked by `requires`.
 A plan never lists child plans. An existing child plan folder, `<NN>-p<N>-<slug>/`, keeps its name.
 
 To close a plan, every task is `done` or `dropped`, and `implemented.md` is written, with `deferred.md` if anything waits.
-Then set `status: built`, correct the specs in `changes` and `creates`, and update the index row.
+Then set `status: built`, and correct the specs in `changes` and `creates`.
 
 ### Shaping a plan
 
@@ -149,7 +149,7 @@ Before a plan is written, each choice that the brief, the code and the reference
 
 ## Before writing
 
-1. Read `.project/plans/index.md` and the domain's `00-<domain>.md`.
+1. Run `scripts/plans.mjs`, and read the domain's `00-<domain>.md`.
 2. Check the thing does not already exist, in `ideas/` and `briefs/` too; amend rather than duplicate.
 3. Find the refs: the code, package, commit or document it came from.
 
@@ -172,5 +172,5 @@ Do it also when a code comment cites a decision number that no plan on disk expl
 
 - No `<placeholder>` left. Every frontmatter path and every relative link resolves (`creates` may name a spec not yet written).
 - Every `status` is one of the values in *Statuses* for its kind.
-- `index.md` has the row and the status.
+- `scripts/plans.mjs` lists the plan with its status.
 - `scripts/lint-prose.mjs` passes on every file you wrote, or each finding it prints is one you chose to keep.

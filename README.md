@@ -26,7 +26,7 @@ Skills follow the [Agent Skills specification](https://agentskills.io/specificat
     └── do-spec/
         ├── SKILL.md          instructions the agent loads
         ├── assets/           the file templates it writes from
-        └── scripts/          lint-prose.mjs, the writing-rules check
+        └── scripts/          lint-prose.mjs, the writing-rules check; plans.mjs, the plan list
 ```
 
 `skills/<name>/SKILL.md` is the layout clients and installers expect: the specification requires a skill's `name` to match its parent directory, and a skill directory is what every client scans for. Adding a skill is dropping a directory with a `SKILL.md` under `skills/`; the installers find it on their own.
